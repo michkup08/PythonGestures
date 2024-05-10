@@ -5,7 +5,9 @@ import copy
 import argparse
 import itertools
 from collections import Counter
+import pyautogui
 from collections import deque
+import time
 
 import cv2 as cv
 import numpy as np
@@ -15,6 +17,7 @@ from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
+mouseForce = 1;
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -130,6 +133,7 @@ def main():
                 # Landmark calculation
                 landmark_list = calc_landmark_list(debug_image, hand_landmarks)
 
+
                 # Conversion to relative coordinates / normalized coordinates
                 pre_processed_landmark_list = pre_process_landmark(
                     landmark_list)
@@ -141,10 +145,79 @@ def main():
 
                 # Hand sign classification
                 hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
-                if hand_sign_id == 2:  # Point gesture
+
+
+
+                if hand_sign_id < 3:  # Point gesture
                     point_history.append(landmark_list[8])
+                    if point_history.__sizeof__() > 2:
+                        pyautogui.moveRel((point_history[-1][0] - point_history[-2][0]) * mouseForce,
+                                          (point_history[-1][1] - point_history[-2][1]) * mouseForce)
+                        if hand_sign_id==1:
+                            pyautogui.mouseDown(button='left')
+                        else:
+                            pyautogui.mouseUp(button='left')
+                        if hand_sign_id==2:
+                            pyautogui.mouseDown(button='right')
+                        else:
+                            pyautogui.mouseUp(button='right')
                 else:
                     point_history.append([0, 0])
+                    if hand_sign_id == 3:
+                        pyautogui.press("a")
+                    elif hand_sign_id == 4:
+                        pyautogui.press("b")
+                    elif hand_sign_id == 5:
+                        pyautogui.press("c")
+                    elif hand_sign_id == 6:
+                        pyautogui.press("d")
+                    elif hand_sign_id == 7:
+                        pyautogui.press("d")
+                    elif hand_sign_id == 8:
+                        pyautogui.press("e")
+                    elif hand_sign_id == 9:
+                        pyautogui.press("f")
+                    elif hand_sign_id == 10:
+                        pyautogui.press("g")
+                    elif hand_sign_id == 11:
+                        pyautogui.press("h")
+                    elif hand_sign_id == 12:
+                        pyautogui.press("i")
+                    elif hand_sign_id == 13:
+                        pyautogui.press("j")
+                    elif hand_sign_id == 14:
+                        pyautogui.press("k")
+                    elif hand_sign_id == 15:
+                        pyautogui.press("l")
+                    elif hand_sign_id == 16:
+                        pyautogui.press("m")
+                    elif hand_sign_id == 17:
+                        pyautogui.press("n")
+                    elif hand_sign_id == 18:
+                        pyautogui.press("o")
+                    elif hand_sign_id == 19:
+                        pyautogui.press("p")
+                    elif hand_sign_id == 20:
+                        pyautogui.press("q")
+                    elif hand_sign_id == 21:
+                        pyautogui.press("r")
+                    elif hand_sign_id == 22:
+                        pyautogui.press("s")
+                    elif hand_sign_id == 23:
+                        pyautogui.press("t")
+                    elif hand_sign_id == 24:
+                        pyautogui.press("u")
+                    elif hand_sign_id == 25:
+                        pyautogui.press("v")
+                    elif hand_sign_id == 26:
+                        pyautogui.press("w")
+                    elif hand_sign_id == 27:
+                        pyautogui.press("x")
+                    elif hand_sign_id == 28:
+                        pyautogui.press("y")
+                    elif hand_sign_id == 29:
+                        pyautogui.press("z")
+
 
                 # Finger gesture classification
                 finger_gesture_id = 0
@@ -285,7 +358,7 @@ def logging_csv(number, mode, landmark_list, point_history_list):
         csv_path = 'model/keypoint_classifier/keypoint.csv'
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
-            writer.writerow([number + 20, *landmark_list]) ##zmiana w chujjjjj######to + 10 czy tam + 20 dodaje sie do numeru gestu####
+            writer.writerow([number, *landmark_list])
     if mode == 2 and (0 <= number <= 9):
         csv_path = 'model/point_history_classifier/point_history.csv'
         with open(csv_path, 'a', newline="") as f:
