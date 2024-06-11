@@ -17,7 +17,9 @@ from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
-mouseForce = 1;
+mouseForce = 4
+frequency = 5
+frequency_writing = 20
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -43,6 +45,8 @@ def get_args():
 
 def main():
     # Argument parsing #################################################################
+
+
     args = get_args()
 
     cap_device = args.device
@@ -100,7 +104,7 @@ def main():
 
     #  ########################################################################
     mode = 0
-
+    frame_counter = 0
     while True:
         fps = cvFpsCalc.get()
 
@@ -123,7 +127,8 @@ def main():
         image.flags.writeable = False
         results = hands.process(image)
         image.flags.writeable = True
-
+        point_history.append([pyautogui.position().x, pyautogui.position().y])
+        #print(pyautogui.size()[0] , pyautogui.size()[1])
         #  ####################################################################
         if results.multi_hand_landmarks is not None:
             for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
@@ -149,74 +154,80 @@ def main():
 
 
                 if hand_sign_id < 3:  # Point gesture
+                    frame_counter += 1
+                    point_history.pop()
                     point_history.append(landmark_list[8])
-                    if point_history.__sizeof__() > 2:
-                        pyautogui.moveRel((point_history[-1][0] - point_history[-2][0]) * mouseForce,
-                                          (point_history[-1][1] - point_history[-2][1]) * mouseForce)
-                        if hand_sign_id==1:
-                            pyautogui.mouseDown(button='left')
-                        else:
-                            pyautogui.mouseUp(button='left')
-                        if hand_sign_id==2:
-                            pyautogui.mouseDown(button='right')
-                        else:
-                            pyautogui.mouseUp(button='right')
+                    if frame_counter % frequency == 0:
+                        frame_counter = 0
+
+                        if point_history.__sizeof__() > 2:
+
+                            pyautogui.moveRel(min(((point_history[-1][0] - point_history[-(frequency+1)][0]) * mouseForce), (pyautogui.size()[0]*0.1)),
+                                              min(((point_history[-1][1] - point_history[-(frequency+1)][1]) * mouseForce),(pyautogui.size()[1]*0.1)), 0.1)
+                            if hand_sign_id==1:
+                                pyautogui.mouseDown(button='left')
+                            else:
+                                pyautogui.mouseUp(button='left')
+                            if hand_sign_id==2:
+                                pyautogui.mouseDown(button='right')
+                            else:
+                                pyautogui.mouseUp(button='right')
                 else:
-                    point_history.append([0, 0])
-                    if hand_sign_id == 3:
-                        pyautogui.press("a")
-                    elif hand_sign_id == 4:
-                        pyautogui.press("b")
-                    elif hand_sign_id == 5:
-                        pyautogui.press("c")
-                    elif hand_sign_id == 6:
-                        pyautogui.press("d")
-                    elif hand_sign_id == 7:
-                        pyautogui.press("d")
-                    elif hand_sign_id == 8:
-                        pyautogui.press("e")
-                    elif hand_sign_id == 9:
-                        pyautogui.press("f")
-                    elif hand_sign_id == 10:
-                        pyautogui.press("g")
-                    elif hand_sign_id == 11:
-                        pyautogui.press("h")
-                    elif hand_sign_id == 12:
-                        pyautogui.press("i")
-                    elif hand_sign_id == 13:
-                        pyautogui.press("j")
-                    elif hand_sign_id == 14:
-                        pyautogui.press("k")
-                    elif hand_sign_id == 15:
-                        pyautogui.press("l")
-                    elif hand_sign_id == 16:
-                        pyautogui.press("m")
-                    elif hand_sign_id == 17:
-                        pyautogui.press("n")
-                    elif hand_sign_id == 18:
-                        pyautogui.press("o")
-                    elif hand_sign_id == 19:
-                        pyautogui.press("p")
-                    elif hand_sign_id == 20:
-                        pyautogui.press("q")
-                    elif hand_sign_id == 21:
-                        pyautogui.press("r")
-                    elif hand_sign_id == 22:
-                        pyautogui.press("s")
-                    elif hand_sign_id == 23:
-                        pyautogui.press("t")
-                    elif hand_sign_id == 24:
-                        pyautogui.press("u")
-                    elif hand_sign_id == 25:
-                        pyautogui.press("v")
-                    elif hand_sign_id == 26:
-                        pyautogui.press("w")
-                    elif hand_sign_id == 27:
-                        pyautogui.press("x")
-                    elif hand_sign_id == 28:
-                        pyautogui.press("y")
-                    elif hand_sign_id == 29:
-                        pyautogui.press("z")
+                    frame_counter += 1
+                    if frame_counter % frequency_writing == 0:
+                        frame_counter = 0
+                        if hand_sign_id == 3:
+                            pyautogui.press("a")
+                        elif hand_sign_id == 4:
+                            pyautogui.press("b")
+                        elif hand_sign_id == 5:
+                            pyautogui.press("c")
+                        elif hand_sign_id == 6:
+                            pyautogui.press("d")
+                        elif hand_sign_id == 7:
+                            pyautogui.press("e")
+                        elif hand_sign_id == 8:
+                            pyautogui.press("f")
+                        elif hand_sign_id == 9:
+                            pyautogui.press("g")
+                        elif hand_sign_id == 10:
+                            pyautogui.press("h")
+                        elif hand_sign_id == 11:
+                            pyautogui.press("i")
+                        elif hand_sign_id == 12:
+                            pyautogui.press("j")
+                        elif hand_sign_id == 13:
+                            pyautogui.press("k")
+                        elif hand_sign_id == 14:
+                            pyautogui.press("l")
+                        elif hand_sign_id == 15:
+                            pyautogui.press("m")
+                        elif hand_sign_id == 16:
+                            pyautogui.press("n")
+                        elif hand_sign_id == 17:
+                            pyautogui.press("o")
+                        elif hand_sign_id == 18:
+                            pyautogui.press("p")
+                        elif hand_sign_id == 19:
+                            pyautogui.press("q")
+                        elif hand_sign_id == 20:
+                            pyautogui.press("r")
+                        elif hand_sign_id == 21:
+                            pyautogui.press("s")
+                        elif hand_sign_id == 22:
+                            pyautogui.press("t")
+                        elif hand_sign_id == 23:
+                            pyautogui.press("u")
+                        elif hand_sign_id == 24:
+                            pyautogui.press("v")
+                        elif hand_sign_id == 25:
+                            pyautogui.press("w")
+                        elif hand_sign_id == 26:
+                            pyautogui.press("x")
+                        elif hand_sign_id == 27:
+                            pyautogui.press("y")
+                        elif hand_sign_id == 28:
+                            pyautogui.press("z")
 
 
                 # Finger gesture classification
@@ -239,7 +250,8 @@ def main():
                     brect,
                     handedness,
                     keypoint_classifier_labels[hand_sign_id],
-                    point_history_classifier_labels[most_common_fg_id[0][0]],
+                    "",
+                    #point_history_classifier_labels[most_common_fg_id[0][0]],
                 )
         else:
             point_history.append([0, 0])
